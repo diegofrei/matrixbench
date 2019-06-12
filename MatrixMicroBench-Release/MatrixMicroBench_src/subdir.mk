@@ -47,7 +47,7 @@ C_DEPS += \
 MatrixMicroBench_src/%.o: ../MatrixMicroBench_src/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: GCC C Compiler'
-	gcc -I"D:\Workspaces\Oxygen\_DSPE\dspe.bench.MatrixBenchMatrixMicroBench_c\csrc" -I"D:\Workspaces\Oxygen\_DSPE\dspe.bench.MatrixBenchMatrixMicroBench_c\MatrixMicroBench_src" -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
+	gcc -I"..\csrc" -I"..\MatrixMicroBench_src" -O3 -Wall -c -fmessage-length=0 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 

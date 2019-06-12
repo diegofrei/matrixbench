@@ -2,7 +2,7 @@
  * File: RunnerGround.h
  *
  * @author diego
- * @created Tue Jun 11 15:38:27 CEST 2019
+ * @created Wed Jun 12 14:23:51 CEST 2019
  */
 #ifndef RunnerGround_h
 #define RunnerGround_h
@@ -12,6 +12,16 @@
 #include "MatrixBenchMatrixMicroBench_Application.h"
 
 #include <stdio.h>
+
+/* DSPESetting definition */
+typedef struct DSPESettings DSPESettings;
+
+struct DSPESettings {
+	int changed;
+
+	/* Multirun support */
+	int numMultiRuns;
+};
 
 /* Error node definition */
 typedef struct DSPEErrorNode DSPEErrorNode;
@@ -79,6 +89,9 @@ struct profile {
 	DSPEProfileTime minResponse;
 	DSPEProfileTime maxResponse;
 	unsigned int responseCount;	
+
+	// Profile unit
+	int profileUnit;
 };
 
 /* Application's inputParameters struct */
@@ -109,6 +122,9 @@ struct MatrixBenchMatrixMicroBench_Application_cmd {
 
 	/* Application */
 	MatrixBenchMatrixMicroBench_Application application;
+
+	/* Settings support */
+	DSPESettings settings;
 
 	/* Input parameters support */ 
 	size_t inputParametersNumElements;
@@ -161,6 +177,11 @@ struct MatrixBenchMatrixMicroBench_Application_cmd {
 
 	/* Log file variable */
 	FILE *logFile;
+
+	/* Profile file variable */
+	FILE *profileFile;
+	/* Open worksheets */
+	int openWorksheets;
 
 };
 

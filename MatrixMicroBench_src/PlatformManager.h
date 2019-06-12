@@ -2,7 +2,7 @@
  * File: PlatformManager.h
  *
  * @author diego
- * @created Tue Jun 11 15:38:27 CEST 2019
+ * @created Wed Jun 12 14:23:53 CEST 2019
  */
 #ifndef PlatformManager_h
 #define PlatformManager_h
@@ -48,15 +48,43 @@
 
 #include <time.h>
 
-typedef clock_t DSPEProfileTime;
+typedef struct timespec DSPEProfileTime;
 
-#define DSPEProfileTime_getMilliseconds(a)	(((double) a * 1000.0) / CLOCKS_PER_SEC)
-#define DSPEProfileTime_setCurrentTicks(a)	a = clock()
-#define DSPEProfileTime_add(a, b) 			(a) += (b)
-#define DSPEProfileTime_sub(a, b) 			(a) -= (b)
-#define DSPEProfileTime_div(a, b) 			(a) /= (b)
-#define DSPEProfileTime_isSet(a) 			((a) != 0)
-#define DSPEProfileTime_cmp(a, b, cmp)		((a) cmp (b))
-#define DSPEProfileTime_init(a)  			(a) = 0
-#define DSPEProfileTime_initMin(a)			(a) = LONG_MAX
+#define DSPEProfileTime_getMilliseconds(a)	(1000.0 * (double) a.tv_sec + (double) a.tv_nsec / 1000000.0)
+#define DSPEProfileTime_setCurrentTicks(a)	clock_gettime(CLOCK_REALTIME, &a)
+#define DSPEProfileTime_add(a, b)       \
+	 (a).tv_sec += (b).tv_sec;  		\
+	 (a).tv_nsec += (b).tv_nsec;        \
+	 if ((a).tv_nsec >= 1000000000) {	\
+			 (a).tv_sec++;              \
+			 (a).tv_nsec -= 1000000000; \
+	 }
+
+#define DSPEProfileTime_sub(a, b)		\
+	 (a).tv_sec -= (b).tv_sec;  		\
+	 (a).tv_nsec -= (b).tv_nsec;        \
+	 if ((a).tv_nsec < 0) {				\
+			 (a).tv_sec--;              \
+			 (a).tv_nsec += 1000000000; \
+	 }
+// REMARK divistion is only aproximated!
+#define DSPEProfileTime_div(a, b)	\
+	 (a).tv_sec /= (b);  			\
+	 (a).tv_nsec /= (b)
+
+#define DSPEProfileTime_isSet(a)		\
+	((a).tv_sec != 0 && (a).tv_nsec != 0)
+
+#define DSPEProfileTime_cmp(a, b, cmp)	\
+      (((a).tv_sec == (b).tv_sec) ?     \
+       ((a).tv_nsec cmp (b).tv_nsec) :  \
+       ((a).tv_sec cmp (b).tv_sec))
+
+#define DSPEProfileTime_init(a)		\
+		(a).tv_sec = 0;  			\
+		(a).tv_nsec = 0
+
+#define DSPEProfileTime_initMin(a)	\
+		(a).tv_sec = LONG_MAX;		\
+		(a).tv_nsec = LONG_MAX
 #endif

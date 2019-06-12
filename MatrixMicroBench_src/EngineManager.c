@@ -2,11 +2,12 @@
  * File: EngineManager.c
  *
  * @author diego
- * @created Tue Jun 11 15:38:27 CEST 2019
+ * @created Wed Jun 12 14:23:52 CEST 2019
  */
 #include "EngineManager.h"
 
 #include "ErrorManager.h"
+#include "ProfileManager.h"
 
 #include "RunnerGround.h"
 
@@ -81,6 +82,10 @@ int engineManager_isSuspended(const DSPEElement *element) {
  */
 void engineManager_run(const DSPEElement *element) {
 	((MatrixBenchMatrixMicroBench_Application_cmd*) element->application)->stopped = 0;
+	/* Benchmark support */
+	profileManager_initBenchmarking(element);
+	/* Profiling support */
+	profileManager_openProfileFile(element);
 }
 
 /**

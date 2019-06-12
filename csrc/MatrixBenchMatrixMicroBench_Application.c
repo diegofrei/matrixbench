@@ -2,11 +2,12 @@
  * File: MatrixBenchMatrixMicroBench_Application.c
  *
  * @author diego
- * @created Tue Jun 11 15:38:25 CEST 2019
+ * @created Wed Jun 12 14:23:51 CEST 2019
  */
 #include "PlatformManager.h"
 #include "StringManager.h"
 #include "MemoryManager.h"
+#include "ProfileManager.h"
 #include "InfoManager.h"
 
 #include "MatrixBenchMatrixMicroBench_Application.h"
@@ -165,7 +166,7 @@ void MatrixBenchMatrixMicroBench_Application_startup(DSPEApplication *applicatio
 	MatrixBenchMatrixMicroBench_Application_connect(context);
 
 	infoManager_writeInfo((DSPEElement*) context, "RUNTIME SETTINGS");
-	infoManager_writeInfo((DSPEElement*) context, " - Multirun  benchmark : disabled");
+	infoManager_writeInfo((DSPEElement*) context, " - Multirun  benchmark : %u", profileManager_getBenchmarkMaxNumRuns((DSPEElement*) context));
 	infoManager_writeInfo((DSPEElement*) context, " - Blocksize benchmark : disabled");
 	/* Runner settings overview */
 	infoManager_writeInfo((DSPEElement*) context, "THREADING SETTINGS");

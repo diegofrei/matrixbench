@@ -2,7 +2,7 @@
  * File: MatrixBenchMatrixMultiplier_SoftwareUnit.c
  *
  * @author diego
- * @created Tue Jun 11 15:38:26 CEST 2019
+ * @created Wed Jun 12 14:23:51 CEST 2019
  */
 #include "PlatformManager.h"
 #include "StringManager.h"

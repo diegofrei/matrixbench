@@ -2,7 +2,7 @@
  * File: MicroBenchEvaluator_SoftwareUnit.c
  *
  * @author diego
- * @created Tue Jun 11 15:38:26 CEST 2019
+ * @created Wed Jun 12 14:23:51 CEST 2019
  */
 #include "PlatformManager.h"
 #include "StringManager.h"
@@ -470,8 +470,16 @@ void MicroBenchEvaluator_SoftwareUnit_processBlock(DSPEComponent *component) {
 	/* Implementation blockSize assignment */
 	implState->blockSize = context->samplesToProcess;
 
+	/* Capture unit process start time */
+	profileManager_captureStartTime((DSPEElement*) context, (profileID) context->unitProfileID);
+
+
 	/* Implementation process() call */
 	MicroBenchEvaluator_Block_CImplementation_process(implState);
+
+	/* Capture unit process end time */
+	profileManager_captureEndTime((DSPEElement*) context, (profileID) context->unitProfileID);
+
 	/* Restores optimization data block */
 	implState->dataIn_Start = dataIn_Start_anchor;
 	implState->dataIn_Stop = dataIn_Stop_anchor;
@@ -513,8 +521,16 @@ void MicroBenchEvaluator_SoftwareUnit_processAutoPullBlock(DSPEComponent *compon
 	/* Implementation blockSize assignment */
 	implState->blockSize = context->samplesToProcess;
 
+	/* Capture unit process start time */
+	profileManager_captureStartTime((DSPEElement*) context, (profileID) context->unitProfileID);
+
+
 	/* Implementation process() call */
 	MicroBenchEvaluator_Block_CImplementation_process(implState);
+
+	/* Capture unit process end time */
+	profileManager_captureEndTime((DSPEElement*) context, (profileID) context->unitProfileID);
+
 	/* Restores optimization data block */
 	implState->dataIn_Start = dataIn_Start_anchor;
 	implState->dataIn_Stop = dataIn_Stop_anchor;

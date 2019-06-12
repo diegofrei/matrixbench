@@ -2,7 +2,7 @@
  * File: CRunner.c
  *
  * @author diego
- * @created Tue Jun 11 15:38:27 CEST 2019
+ * @created Wed Jun 12 14:23:51 CEST 2019
  */
 #include "ErrorManager.h"
 #include "MemoryManager.h"
@@ -84,9 +84,11 @@ int main(int argc, char *argv[]) {
 	/* Start runner */
 	engineManager_run((DSPEElement*) context);
 
-	/* Start runner processing */
-	run(context, iter);
-
+	/* Benchmark run - while benchmark has not completed */
+	while (!engineManager_isStopped((DSPEElement*) context)) {
+		/* start runner processing */
+		run(context, iter);
+	}
 	/* Destroy runner */
 	destroyRunner(context);
 

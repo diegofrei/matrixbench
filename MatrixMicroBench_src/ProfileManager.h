@@ -2,13 +2,15 @@
  * File: ProfileManager.h
  *
  * @author diego
- * @created Tue Jun 11 15:38:27 CEST 2019
+ * @created Wed Jun 12 14:23:52 CEST 2019
  */
 #ifndef ProfileManager_h
 #define ProfileManager_h
 
 #include "DSPEElements.h"
 
+// Profiling with benchmarking support
+#define PROFILE_BENCHMARKING
 /* Profile ids */
 typedef enum profileID {
 	MatrixMicroBench_MatrixSource_ID,
@@ -19,6 +21,17 @@ typedef enum profileID {
 	profileIDCount
 } profileID;
 
+/* BenchmarkHandler support */
+typedef struct DSPEBenchmarkHandler DSPEBenchmarkHandler;
+
+struct DSPEBenchmarkHandler {
+	DSPEHandler handler;
+
+	/* Multirun benchmarking */
+	size_t curNumRun;
+	size_t numRunMin;
+	size_t numRunMax;
+};
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -202,6 +215,126 @@ double profileManager_getTotalUnitProcessTime(const DSPEElement *element);
  * ProfileManager_showProfileInfo function
  */
 void profileManager_showProfileInfo(const DSPEElement *element, profileID id);
+
+
+/******************************************************************************
+ * BENCHMARKING SUPPORT
+ ******************************************************************************/
+
+/**
+ * ProfileManager_initBenchmarkHandler function
+ */
+void profileManager_initBenchmarkHandler(DSPEApplication *application);
+
+/**
+ * ProfileManager_updateBenchmarking function
+ */
+int profileManager_updateBenchmarking(const DSPEElement *element);
+
+/**
+ * ProfileManager_initBenchmarking function
+ */
+void profileManager_initBenchmarking(const DSPEElement *element);
+
+/**
+ * ProfileManager_isBenchmarkingDone function
+ */
+int profileManager_isBenchmarkingDone(const DSPEElement *element);
+
+/**
+ * profileManager_resetBenchmarkHandler function
+ */
+void profileManager_resetBenchmarkHandler(const DSPEElement *element);
+
+/**
+ * profileManager_getBenchmarkMaxNumRuns function
+ */
+size_t profileManager_getBenchmarkMaxNumRuns(DSPEElement *element);
+
+/**
+ * profileManager_getBenchmarkCurNumRuns function
+ */
+size_t profileManager_getBenchmarkCurNumRuns(DSPEElement *element);
+
+/**
+ * profileManager_getBenchmarkMinBlocksize function
+ */
+size_t profileManager_getBenchmarkMinBlocksize(DSPEElement *element);
+
+/**
+ * profileManager_getBenchmarkMaxBlocksize function
+ */
+size_t profileManager_getBenchmarkMaxBlocksize(DSPEElement *element);
+
+/**
+ * profileManager_getBenchmarkCurBlocksize function
+ */
+size_t profileManager_getBenchmarkCurBlocksize(DSPEElement *element);
+
+/**
+ * profileManager_getBenchmarkMaxEngines function
+ */
+size_t profileManager_getBenchmarkMaxEngines(DSPEElement *element);
+
+/**
+ * profileManager_getBenchmarkCurNumEngines function
+ */
+size_t profileManager_getBenchmarkCurNumEngines(DSPEElement *element);
+
+/******************************************************************************
+ * PROFILING FILE SUPPORT
+ ******************************************************************************/
+
+
+/**
+ * ProfileManager_openProfileFile function
+ */
+void profileManager_openProfileFile(const DSPEElement *element);
+
+/**
+ * ProfileManager_closeProfileFile function
+ */
+void profileManager_closeProfileFile(const DSPEElement *element);
+
+/**
+ * ProfileManager_writeWorksheetHead function
+ */
+void profileManager_writeWorksheetHead(const DSPEElement *element, const char *name);
+
+/**
+ * ProfileManager_writeWorksheetTail function
+ */
+void profileManager_writeWorksheetTail(const DSPEElement *element);
+
+/**
+ * ProfileManager_writeProfileInfoHeader function
+ */
+void profileManager_writeProfileInfoHeader(const DSPEElement *element);
+
+/**
+ * ProfileManager_writeProfileInfo function
+ */
+void profileManager_writeProfileInfo(const DSPEElement *element, profileID id);
+
+/**
+ * ProfileManager_writeNumRun function
+ */
+void profileManager_writeNumRun(const DSPEElement *element, size_t curNumRun);
+
+/**
+ * ProfileManager_writeBlockSize function
+ */
+void profileManager_writeBlockSize(const DSPEElement *element, size_t blockSize);
+
+/**
+ * ProfileManager_writeAverages function
+ */
+void profileManager_writeAverages(const DSPEElement *element, size_t numRuns);
+
+/**
+ * ProfileManager_writeResultsWorksheet function
+ */
+void profileManager_writeResultsWorksheet(const DSPEElement *element, size_t minEngines, size_t maxEngines, size_t numRuns, size_t minBlockSize, size_t maxBlockSize);
 
 #ifdef __cplusplus
 } /* extern "C" */

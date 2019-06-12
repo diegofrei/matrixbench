@@ -2,7 +2,7 @@
  * File: TextualRepresentation.c
  *
  * @author diego
- * @created Tue Jun 11 15:38:27 CEST 2019
+ * @created Wed Jun 12 14:23:52 CEST 2019
  */
 #include "StringManager.h"
 #include "MemoryManager.h"
@@ -437,6 +437,44 @@ void createInputParameters(MatrixBenchMatrixMicroBench_Application_cmd *context)
 }
 
 /**
+ * commandSettings function.
+ * Shows the current state of the settings
+ */
+void commandSettings(MatrixBenchMatrixMicroBench_Application_cmd *context) {
+	DSPESettings *settings = &context->settings;
+	printf("\nSETTINGS:\n\n");
+	printf("multirun : %d\n", settings->numMultiRuns);
+}
+
+/**
+ * handleSettings function.
+ * Sets settings values
+ */
+void handleSettings(MatrixBenchMatrixMicroBench_Application_cmd *context, char *opt, char *value, int *err) {
+	DSPESettings *settings = &context->settings;
+	int tmp;
+
+	if (stringSupport_compareNoCase(opt, "setmultirun") == 0) {
+		tmp = atoi(value);
+		if (tmp < 1) {
+			printf("Minimum value not respected! %d replaced with 1\n", tmp);
+			settings->numMultiRuns = 1;
+			settings->changed = 1;
+			return;
+		}
+		if (tmp > 50) {
+			printf("Maximum value not respected! %d replaced with 50\n", tmp);
+			settings->numMultiRuns = 50;
+			settings->changed = 1;
+			return;
+		}
+		settings->numMultiRuns = tmp;
+		settings->changed = 1;
+		return;
+	}
+}
+
+/**
  * optionG function.
  * Displays the selected gate constraints.
  */
@@ -508,6 +546,7 @@ void optionH() {
 	printf("-g <gate> ............... Display gate constraints\n");
 	printf("-loadParams <file.csv> .. Load input parameters from file\n");
 	printf("-createParams ........... Creates input parameters file 'MatrixBenchMatrixMicroBench_Application.csv' with default values\n");
+	printf("-setMultiRun <value> .... Sets the number of multiple executions with same settings to given value [1, 50]\n");
 }
 
 /**
@@ -539,6 +578,13 @@ int handleOptions(MatrixBenchMatrixMicroBench_Application_cmd *context, char *op
 			return 1;
 		}
 		optionPn(context, opt, value, err);
+
+	} else if (stringSupport_nCompareNoCase(opt, "-set", 4) == 0) {
+		if (lastOpt) {
+			infoManager_writeInfo((DSPEElement*) context, "ERROR: Option %s without value!", opt);
+			return 1;
+		}
+		handleSettings(context, &opt[1], value, err);
 
 	} else if (stringSupport_nCompareNoCase(opt, "-loadParams", 11) == 0) {
 		if (lastOpt) {

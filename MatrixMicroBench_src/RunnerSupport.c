@@ -2,7 +2,7 @@
  * File: RunnerSupport.c
  *
  * @author diego
- * @created Tue Jun 11 15:38:27 CEST 2019
+ * @created Wed Jun 12 14:23:52 CEST 2019
  */
 #include "PlatformManager.h"
 #include "ErrorManager.h"
@@ -61,12 +61,25 @@ MatrixBenchMatrixMicroBench_Application_cmd* initializeRunner() {
 	/* Profile manager initialization */
 	profileManager_initialize(element);
 
+	/* Init profileFile */
+	context->profileFile = NULL;
+
+
+	/* DSPESettings initialization */
+	context->settings.changed = 0;
+
+	/* MultiRun settings initialization */
+	context->settings.numMultiRuns = 3;
+
 
 	/* DSPEInputParameters initialization */
 	context->inputParametersNumElements = 0;
 	context->inputParametersCurr = NULL;
 	context->inputParametersHead = NULL;
 	context->inputParametersTail = NULL;
+
+	/* Benchmark handler initialization */
+	profileManager_initBenchmarkHandler((DSPEApplication*) context);
 
 	/* Open log file */
 	openLogFile(context, 1);
@@ -271,12 +284,16 @@ void MatrixBenchMatrixMicroBench_Application_runnerPreProcess(DSPEComponent *com
 	MatrixBenchMatrixMicroBench_Application_cmd *context = (MatrixBenchMatrixMicroBench_Application_cmd*) component;
 	DSPEElement *element = (DSPEElement*) context;
 
-	
-	// Load new set of input parameters
-	loadNewInputParameterSet(context);
+		if (profileManager_isBenchmarkingDone((DSPEElement*) context)) {
+		// Load new set of input parameters
+		loadNewInputParameterSet(context);
+	}
 	infoManager_writeInfo(element, "--- RUN STARTED ---");
 	/* Application preprocessing; forces the output parameters update */
 	MatrixBenchMatrixMicroBench_Application_preProcess(component);
+
+	/* Capture application process start time */
+	profileManager_captureStartTime(element, MatrixMicroBench_ID);
 }
 
 /**
@@ -289,6 +306,8 @@ void MatrixBenchMatrixMicroBench_Application_runnerPostProcess(DSPEComponent *co
 	DSPEElement *element = (DSPEElement*) context;
 
 
+	/* Capture application process end time */
+	profileManager_captureEndTime(element, MatrixMicroBench_ID);
 
 	/* Application postprocessing; forces the output parameters update */
 	MatrixBenchMatrixMicroBench_Application_postProcess(component);
@@ -317,7 +336,14 @@ void MatrixBenchMatrixMicroBench_Application_runnerPostProcess(DSPEComponent *co
 		fprintf(context->logFile, "%s (%u times)\n", infoSupport_getCollectedInfoString((infoID) i), count);
 	}
 
+	/* Show application profile */
+	profileManager_showProfileInfo(element, MatrixMicroBench_ID);
 
+	/* Write application profile */
+	profileManager_writeProfileInfo(element, MatrixMicroBench_ID);
+
+	/* Write profile info header */
+	profileManager_writeProfileInfoHeader(element);
 	/* Show profile info */
 	infoManager_writeInfo(element, "ID\tmin [ms]\tmean [ms]\tmax [ms]\tnum measures\ttotal [ms]");
 	infoManager_writeInfo(element, "--------------------------------------------------------------------------------");
@@ -326,6 +352,8 @@ void MatrixBenchMatrixMicroBench_Application_runnerPostProcess(DSPEComponent *co
 			/* Application profile info has already been shown */ 
 			continue;
 		profileManager_showProfileInfo(element, (profileID) i);
+		/* Write to profile file */
+		profileManager_writeProfileInfo(element, (profileID) i);
 	}
 	infoManager_writeInfo(element, "--------------------------------------------------------------------------------");
 
@@ -333,7 +361,13 @@ void MatrixBenchMatrixMicroBench_Application_runnerPostProcess(DSPEComponent *co
 	resetProfileData(context);
 
 	infoManager_writeInfo(element, "--- RUN TERMINATED ---");
-
+	/* Benchmark support */
+	if (!profileManager_updateBenchmarking(element))
+		engineManager_run(element);
+	else {
+		/* Close profileFile */
+		profileManager_closeProfileFile(element);
+	}
 	/* inputParameters support */
 	if (context->inputParametersCurr != NULL) {
 		engineManager_run(element);
